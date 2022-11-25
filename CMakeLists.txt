@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.23)
 project(PhysicsEngine LANGUAGES CXX C)
 
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(dependencies)
 
@@ -10,3 +10,13 @@ add_executable(${PROJECT_NAME} src/main.cpp include/PhysicsEngine/Scene/SceneMan
 
 target_include_directories(${PROJECT_NAME} PRIVATE include/PhysicsEngine)
 target_link_libraries(${PROJECT_NAME} raylib squirrelNoise fmt thread-pool)
+
+include(CheckIPOSupported)
+check_ipo_supported(RESULT supported OUTPUT error)
+
+if (supported)
+    message(STATUS "IPO / LTO enabled")
+    set_property(TARGET PhysicsEngine PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+else ()
+    message(STATUS "IPO / LTO not supported: <${error}>")
+endif ()

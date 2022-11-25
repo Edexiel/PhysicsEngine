@@ -6,8 +6,13 @@
 
 Broadphase algorithm and AABB collision
 
-`/src/Scene/World.cpp`
+Polygons in purple are detected as potential collision
+Polygons in black not
+AABB in green means there is no collisions with another AABB
+AABB in red means there is a collision with another AABB
 
+
+Sweep and prune algorithm :
 ```cpp
 // /src/Scene/World.cpp
 // /include/PhysicsEngine/Scene/World.hpp
@@ -16,15 +21,36 @@ void GetCollidingPairsToCheck(std::vector<std::tuple<Object &, Object &>> &pairs
 bool CheckCollisionAABB(const Rectangle& a, const Rectangle&b) const;
 ```
 
+main program and scene config : 
+```cpp
+// src/main.cpp
+Vector2 screenSize{.x=1280, .y=720};
+
+RandomPolyParams params
+{
+.minPoints = 3,
+.maxPoints = 8,
+.minRadius = 10.0f,
+.maxRadius = 35.0f,
+.minBounds = Vector2{.x=50, .y= 50},
+.maxBounds = Vector2{.x=screenSize.x - 50, .y=screenSize.y - 50},
+.minSpeed = 1.0f,
+.maxSpeed = 3.0f
+};
+
+
+SceneManager sceneManager{world};
+sceneManager.AddScene<SceneBouncingPoly>(world, 50, params);
+```
 ## Builds
 
 ### Linux
 
-`/build/linux/PhysicsEngine`
+`/build/linux/Release/PhysicsEngine`
 
 ### Windows
 
-`/build/linux/PhysicsEngine.exe`
+`/build/Windows/Release/PhysicsEngine.exe`
 
 ## How to compile
 
@@ -92,12 +118,16 @@ mkdir build/Release
 cmake --build cmake-build-release -j12
 ```
 
-## State
+[//]: # (## State)
 
-### What works :
+[//]: # ()
+[//]: # (### What works :)
 
-- Stuff
+[//]: # ()
+[//]: # (- AABB)
 
-### What doesn't
+[//]: # ()
+[//]: # (### What doesn't)
 
-- other stuff 
+[//]: # ()
+[//]: # (- other stuff )

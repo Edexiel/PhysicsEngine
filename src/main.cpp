@@ -34,7 +34,7 @@ int main()
 
 
     SceneManager sceneManager{world};
-    sceneManager.AddScene<SceneBouncingPoly>(world, 200, params);
+    sceneManager.AddScene<SceneBouncingPoly>(world, 50, params);
 
 
     sceneManager.LoadScene(0);
