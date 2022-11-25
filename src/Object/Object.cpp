@@ -4,9 +4,15 @@
 #include "float.h"
 #include "Utils.hpp"
 
-Object::Object(const Vector2 &position, float rotation) : position(position), _rotation(DEG2RAD * rotation)
+Object::Object(const Vector2 &position, float rotation) : _position(position), _rotation(DEG2RAD * rotation)
 {
-    generateBoundingBox();
+//    generateBoundingBox();
+////    _aabb = {_boundingBox};
+//    _aabb.x = _boundingBox.x + _position.x;
+//    _aabb.y = _boundingBox.y + _position.y;
+//    _aabb.width = _boundingBox.width;
+//    _aabb.height = _boundingBox.height;
+
 }
 
 bool Object::isPointInside(const Vector2 &point) const
@@ -21,7 +27,7 @@ std::vector<Vector2> &Object::getTransformedPoints()
 
     for (const auto &point: _points)
     {
-        _transformedPoints.push_back(Vector2Add(position, Vector2Rotate(point, _rotation)));
+        _transformedPoints.push_back(Vector2Add(_position, Vector2Rotate(point, _rotation)));
     }
     return _transformedPoints;
 }
@@ -49,12 +55,15 @@ void Object::generateBoundingBox()
     _boundingBox.width = maxX - minX;
     _boundingBox.height = maxY - minY;
 }
-Rectangle Object::getAABB()
+const Rectangle &Object::getAABB()
 {
-    Rectangle AABB{_boundingBox};
-    AABB.x += position.x;
-    AABB.y += position.y;
-    return AABB;
+    generateBoundingBox();
+    _aabb = {_boundingBox};
+    _aabb.x = _boundingBox.x + _position.x;
+    _aabb.y = _boundingBox.y + _position.y;
+    _aabb.width = _boundingBox.width;
+    _aabb.height = _boundingBox.height;
+    return _aabb;
 }
 void Object::Rotate(float rotations)
 {
@@ -62,6 +71,15 @@ void Object::Rotate(float rotations)
     _rotation = fmod(_rotation, PI * 2) - PI; //todo test this
     generateBoundingBox();
 }
+void Object::Move(const Vector2 &move)
+{
+//    _dirtyPosAABB = true; //object was moved, need to recalculate AABB position
+    _position = Vector2Add(_position, move);
+
+    _aabb.x = _boundingBox.x + _position.x;
+    _aabb.y = _boundingBox.y + _position.y;
+}
+
 //Object Object::GetTriangle(float base, float height)
 //{
 //    return Object(Vector2());
@@ -80,7 +98,7 @@ void Object::Rotate(float rotations)
 //}
 Object Object::AddRandomPoly(const RandomPolyParams &params)
 {
-    Vector2 position
+    Vector2 pos
             {
                     .x=Utils::Random(params.minBounds.x, params.maxBounds.x),
                     .y=Utils::Random(params.minBounds.y, params.maxBounds.y)
@@ -90,7 +108,7 @@ Object Object::AddRandomPoly(const RandomPolyParams &params)
 
     int pointsCount = Utils::Random(params.minPoints, params.maxPoints);
 
-    Object obj{position, rotation};
+    Object obj{pos, rotation};
 
     float radius = Utils::Random(params.minRadius, params.maxRadius);
 

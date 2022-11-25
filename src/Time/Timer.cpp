@@ -11,9 +11,9 @@ void Timer::Stop()
 {
     end = high_resolution_clock::now();
 }
-float Timer::GetDuration() const
+double Timer::GetDuration() const
 {
-    return (float) duration_cast<milliseconds>(end - start).count();
+    return duration<double, std::milli>(end - start).count();
 }
 std::basic_string<char> Timer::GetStringDuration(const char *message) const
 {

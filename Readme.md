@@ -1,15 +1,41 @@
 # Physics Engine - Guillaume Nisi
 
-## Dependencies
+## Description
+
+2D physics engine using Sweep and prune broadphase.
+
+Broadphase algorithm and AABB collision
+
+`/src/Scene/World.cpp`
+
+```cpp
+// /src/Scene/World.cpp
+// /include/PhysicsEngine/Scene/World.hpp
+
+void GetCollidingPairsToCheck(std::vector<std::tuple<Object &, Object &>> &pairsToCheck);
+bool CheckCollisionAABB(const Rectangle& a, const Rectangle&b) const;
+```
+
+## Builds
+
+### Linux
+
+`/build/linux/PhysicsEngine`
+
+### Windows
+
+`/build/linux/PhysicsEngine.exe`
+
+## How to compile
+
+Compiled and tested on GCC
+
+### Dependencies
 
 - CMake
 - (optional) Ninja
 - (optional) GCC
 - (optional) Clang
-
-## How to compile
-
-Compiled and tested on GCC
 
 ### Use CLion
 
@@ -58,6 +84,7 @@ cmake -S . -B cmake-build-release  -DCMAKE_BUILD_TYPE=Release
 mkdir build/Debug
 cmake --build cmake-build-debug -j12
 ```
+
 ##### Release
 
 ```shell

@@ -9,10 +9,11 @@ class Timer
 private:
     std::chrono::time_point<std::chrono::system_clock> start, end;
 
+public:
     void Start();
     void Stop();
 
-    float GetDuration() const;
+    double GetDuration() const;
     std::basic_string<char> GetStringDuration(const char *) const;
 
 };

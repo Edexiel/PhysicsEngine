@@ -20,22 +20,25 @@ private:
     std::vector<Vector2> _transformedPoints{};
 
     Rectangle _boundingBox{};
+    Rectangle _aabb{};
     void generateBoundingBox();
     float _rotation; //radian
-
+    Vector2 _position;
+//    bool _dirtyPosAABB = true;
 
 public:
 
     Object() = delete;
     explicit Object(const Vector2 &position, float rotation = 0.f);
-    Vector2 position;
     Vector2 speed;
     Color color = BLACK;
 
+    bool collide = false;
     bool isPointInside(const Vector2 &point) const;
     std::vector<Vector2> &getTransformedPoints();
-    Rectangle getAABB();
+    const Rectangle &getAABB();
     void Rotate(float rotations);//degres
+    void Move(const Vector2 &move);
 
 //    static Object GetTriangle(float base, float height);
 //    static Object GetRectangle(float width, float height);

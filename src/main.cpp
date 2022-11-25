@@ -3,6 +3,7 @@
 #include "Scene/World.hpp"
 #include "fmt/core.h"
 #include "Scene/SceneBouncingPoly.hpp"
+#include "Object/Object.hpp"
 
 #define RAYMATH_STATIC_INLINE
 
@@ -19,8 +20,21 @@ int main()
 
     World world{screenSize};
 
+    RandomPolyParams params
+            {
+                    .minPoints = 3,
+                    .maxPoints = 8,
+                    .minRadius = 10.0f,
+                    .maxRadius = 35.0f,
+                    .minBounds = Vector2{.x=50, .y= 50},
+                    .maxBounds = Vector2{.x=screenSize.x - 50, .y=screenSize.y - 50},
+                    .minSpeed = 1.0f,
+                    .maxSpeed = 3.0f
+            };
+
+
     SceneManager sceneManager{world};
-    sceneManager.AddScene<SceneBouncingPoly>(world,10);
+    sceneManager.AddScene<SceneBouncingPoly>(world, 200, params);
 
 
     sceneManager.LoadScene(0);
@@ -48,7 +62,7 @@ int main()
         }
 
         // Update
-        world.Update(GetFrameTime());
+        world.Update(GetFrameTime(), debug);
 
 
         // Draw
