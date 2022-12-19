@@ -6,28 +6,36 @@
 #include "raylib.h"
 #include "Object/Object.hpp"
 #include "Time/Timer.hpp"
-#include <tuple>
+
+struct CollisionPair
+{
+    CollisionPair(Object &a, Object &b) : a(a), b(b) {}
+    Object &a, &b;
+};
 
 class System;
 
 class World
 {
 private:
-
-
     Timer _timer{};
     Vector2 gravity{0, -9.81};
     Vector2 &screenSize;
 
-    std::vector<std::tuple<Object &, Object &>> _pairsToCheck{};
+    std::vector<CollisionPair> _pairsToCheck;
+    std::vector<CollisionPair> _collidingPairs;
     std::vector<System *> _systems;
     std::vector<Object> _objects;
-    void GetCollidingPairsToCheck(std::vector<std::tuple<Object &, Object &>> &pairsToCheck);
-    bool CheckCollisionAABB(const Rectangle& a, const Rectangle&b) const;
+    void GetCollidingPairsToCheck(std::vector<CollisionPair> &pairsToCheck);
+    void AABBCollisionCheck(std::vector<CollisionPair> &pairsToCheck);
+    static bool AABBCollide(const Rectangle &a, const Rectangle &b);
+    static Vector2 TripleProduct(const Vector2 &a, const Vector2 &b, const Vector2 &c);
 
 
-    void broadphase();
+    void BroadPhase();
+    void NarrowPhase();
 
+    bool gjk(Object &a, Object &ObjectB);
 
 public:
 

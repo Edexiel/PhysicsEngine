@@ -1,26 +1,36 @@
 #include "Scene/World.hpp"
 #include "Object/Object.hpp"
 #include <algorithm>
+#include "raymath.h"
+#include "Utils.hpp"
 
 struct
 {
-    bool operator()(Object &a, Object &b) const
+    inline bool operator()(Object &a, Object &b) const
     {
         return (a.getAABB().x < b.getAABB().x);
     }
 } AABBComp;
 
+Vector2 World::TripleProduct(const Vector2 &a, const Vector2 &b, const Vector2 &c)
+{
+    float z = a.x * b.y - a.y * b.x;
+    return {-c.y * z, c.x * z};
+}
+
 World::World(Vector2 &screenSize) : screenSize(screenSize) {}
 
-bool World::CheckCollisionAABB(const Rectangle &a, const Rectangle &b) const
+inline bool World::AABBCollide(const Rectangle &a, const Rectangle &b)
 {
-    bool collisionX = a.x + a.width >= b.x && b.x + b.width >= a.x;
-    bool collisionY = a.y + a.height >= b.y && b.y + b.height >= a.y;
+//    bool collisionX = a.x + a.width >= b.x && b.x + b.width >= a.x;
+    return a.y + a.height >= b.y && b.y + b.height >= a.y;
 
-    return collisionX && collisionY;
+//    return collisionX && collisionY;
 
 }
-void World::GetCollidingPairsToCheck(std::vector<std::tuple<Object &, Object &>> &pairsToCheck)
+
+//Sweep and prune
+void World::GetCollidingPairsToCheck(std::vector<CollisionPair> &pairsToCheck)
 {
     pairsToCheck.clear();
     std::sort(_objects.begin(), _objects.end(), AABBComp);
@@ -40,39 +50,116 @@ void World::GetCollidingPairsToCheck(std::vector<std::tuple<Object &, Object &>>
 
                 break;
             }
-            _objects[i].color = PURPLE;
-            _objects[j].color = PURPLE;
+//            _objects[i].color = PURPLE;
+//            _objects[j].color = PURPLE;
             pairsToCheck.emplace_back(_objects[i], _objects[j]);
         }
     }
 }
-
-
-void World::broadphase()
+void World::AABBCollisionCheck(std::vector<CollisionPair> &pairsToCheck)
 {
-    GetCollidingPairsToCheck(_pairsToCheck);
+    _collidingPairs.clear();
 
-    for (auto &pairsToCheck: _pairsToCheck)
+    for (const CollisionPair &pair: _pairsToCheck)
     {
-        Object &a = std::get<0>(pairsToCheck);
-        Object &b = std::get<1>(pairsToCheck);
-
-        if (CheckCollisionAABB(a.getAABB(), b.getAABB()))
+        if (AABBCollide(pair.a.getAABB(), pair.b.getAABB()))
         {
-
-            a.collide = true;
-            b.collide = true;
+            pair.a.collide = true;
+            pair.b.collide = true;
+            _collidingPairs.emplace_back(pair);
         }
-
     }
-
 }
 
+
+void World::BroadPhase()
+{
+    GetCollidingPairsToCheck(_pairsToCheck);
+    AABBCollisionCheck(_pairsToCheck);
+}
+
+bool World::gjk(Object &ObjectA, Object &ObjectB)
+{
+    int index = 0;
+    Vector2 simplex[3]{};
+    Vector2 direction, ab, ao, ac, acperp, abperp;
+
+    //First point simplex[0] ==> a
+    simplex[0] = Object::GetSupport(ObjectA, ObjectB, {1.f, 0.f});
+    //First direction
+    direction = Vector2Scale(simplex[0], -1.f);
+
+    while (true)
+    {
+        index++;
+        //second point
+        simplex[index] = Object::GetSupport(ObjectA, ObjectB, direction);
+        //no collision
+        if (Vector2DotProduct(simplex[index], direction) <= 0)
+            return false;
+
+        if (index == 1) //Line
+        {
+            //second direction
+            ab = Vector2Subtract(simplex[1], simplex[0]);
+            ao = Vector2Scale(simplex[0], -1.f);
+
+            if (Vector2DotProduct(direction, ao) > 0)
+            {
+                direction = TripleProduct(ab, ao, ab);
+            } else
+            {
+                direction = ao;
+                index--;
+            }
+            continue;
+        }
+//        index == 2 //triangle
+
+        //a => simplex[0]
+        //b => simplex[1]
+        //c => simplex[2] => current index
+
+        ab = Vector2Subtract(simplex[1], simplex[0]); //todo we already have it
+        ac = Vector2Subtract(simplex[2], simplex[0]);
+
+        acperp = TripleProduct(ab, ac, ac);
+
+        if (Vector2DotProduct(direction, ao) >= 0)
+        {
+            direction = acperp;
+        } else
+        {
+            abperp = TripleProduct(ac, ab, ab);
+            if (Vector2DotProduct(abperp, ao) < 0)
+                return true; //collision
+
+            simplex[0] = simplex[1];
+            direction = abperp;
+        }
+        simplex[1] = simplex[2];
+        index--;
+    }
+
+    return false;
+}
+
+void World::NarrowPhase()
+{
+    for (const auto &pair: _collidingPairs)
+    {
+        if (gjk(pair.a, pair.b))
+        {
+            pair.a.color = PURPLE;
+            pair.b.color = PURPLE;
+        }
+    }
+}
 
 void World::Update(float deltaTime, bool debug)
 {
     _timer.Start();
-    broadphase();
+    BroadPhase();
     _timer.Stop();
 
     if (debug)
@@ -82,16 +169,16 @@ void World::Update(float deltaTime, bool debug)
         TraceLog(LOG_DEBUG, message.c_str());
     }
 
-//    _timer.Start();
-//    //narrowphase
-//    _timer.Stop();
-//
-//    if (debug)
-//    {
-//        std::basic_string<char> message = _timer.GetStringDuration("Narrow phase :");
-//        DrawText(message.c_str(), 5, (int) screenSize.y - 20, 20, LIME);
-//        TraceLog(LOG_DEBUG, message.c_str());
-//    }
+    _timer.Start();
+    NarrowPhase();
+    _timer.Stop();
+
+    if (debug)
+    {
+        std::basic_string<char> message = _timer.GetStringDuration("Narrow phase :");
+        DrawText(message.c_str(), 5, (int) screenSize.y - 20, 20, LIME);
+        TraceLog(LOG_DEBUG, message.c_str());
+    }
 
 }
 
@@ -106,7 +193,7 @@ void World::Draw(bool debug)
         if (debug)
         {
             const Rectangle &temp = object.getAABB();
-            const Color color = object.collide ? RED : LIME;
+            const Color color = object.collide ? PURPLE : LIME;
 
             DrawLine(temp.x, temp.y, temp.x + temp.width, temp.y, color); //top
             DrawLine(temp.x, temp.y + temp.height, temp.x + temp.width, temp.y + temp.height, color); //top

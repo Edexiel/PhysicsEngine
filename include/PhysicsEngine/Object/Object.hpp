@@ -24,7 +24,6 @@ private:
     void generateBoundingBox();
     float _rotation; //radian
     Vector2 _position;
-//    bool _dirtyPosAABB = true;
 
 public:
 
@@ -36,9 +35,15 @@ public:
     bool collide = false;
     bool isPointInside(const Vector2 &point) const;
     std::vector<Vector2> &getTransformedPoints();
-    const Rectangle &getAABB();
+    void addPoints(std::vector<Vector2> &&points);
     void Rotate(float rotations);//degres
     void Move(const Vector2 &move);
+    const Rectangle &getAABB();
+    const Vector2 &GetPosition() const;
+
+    Vector2 &GetFurthestPoint(Vector2 direction);
+    static Vector2 GetSupport(Object &v1, Object &v2, Vector2 direction);
+
 
 //    static Object GetTriangle(float base, float height);
 //    static Object GetRectangle(float width, float height);

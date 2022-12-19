@@ -23,19 +23,17 @@ int main()
     RandomPolyParams params
             {
                     .minPoints = 3,
-                    .maxPoints = 8,
+                    .maxPoints = 7,
                     .minRadius = 10.0f,
-                    .maxRadius = 35.0f,
+                    .maxRadius = 20.0f,
                     .minBounds = Vector2{.x=50, .y= 50},
                     .maxBounds = Vector2{.x=screenSize.x - 50, .y=screenSize.y - 50},
                     .minSpeed = 1.0f,
                     .maxSpeed = 3.0f
             };
 
-
     SceneManager sceneManager{world};
-    sceneManager.AddScene<SceneBouncingPoly>(world, 50, params);
-
+    sceneManager.AddScene<SceneBouncingPoly>(world, 200, params);
 
     sceneManager.LoadScene(0);
 

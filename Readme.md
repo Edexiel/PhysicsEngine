@@ -4,7 +4,7 @@
 
 2D physics engine using Sweep and prune broadphase.
 
-Broadphase algorithm and AABB collision
+BroadPhase algorithm and AABB collision
 
 Polygons in purple are detected as potential collision
 Polygons in black not
@@ -18,9 +18,17 @@ Sweep and prune algorithm :
 // /include/PhysicsEngine/Scene/World.hpp
 
 void GetCollidingPairsToCheck(std::vector<std::tuple<Object &, Object &>> &pairsToCheck);
-bool CheckCollisionAABB(const Rectangle& a, const Rectangle&b) const;
+bool AABBCollide(const Rectangle& a, const Rectangle&b) const;
 ```
 
+GJK algorithm (does not works 😭)
+```cpp
+// /src/Scene/World.cpp
+// /include/PhysicsEngine/Scene/World.hpp
+
+bool gjk(Object &a, Object &ObjectB);
+
+```
 main program and scene config : 
 ```cpp
 // src/main.cpp
