@@ -2,22 +2,14 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "float.h"
-#include "Utils.hpp"
+#include "Tools/RandomUtils.hpp"
 
-Object::Object(const Vector2 &position, float rotation) : _position(position), _rotation(DEG2RAD * rotation)
+Object::Object(const Vector2 &position, float rotation) : _position(position), _rotation(DEG2RAD * rotation),
+                                                          _color(BLACK) {}
+
+bool Object::isPointInsideAABB(const Vector2 &p) const
 {
-//    generateBoundingBox();
-////    _aabb = {_boundingBox};
-//    _aabb.x = _boundingBox.x + _position.x;
-//    _aabb.y = _boundingBox.y + _position.y;
-//    _aabb.width = _boundingBox.width;
-//    _aabb.height = _boundingBox.height;
-
-}
-
-bool Object::isPointInside(const Vector2 &point) const
-{
-    return false;
+    return (p.x >= _aabb.x && p.x <= _aabb.x + _aabb.width) && (p.y >= _aabb.y && p.y <= p.y + _aabb.height);
 }
 
 std::vector<Vector2> &Object::getTransformedPoints()
@@ -30,7 +22,7 @@ std::vector<Vector2> &Object::getTransformedPoints()
     return _transformedPoints;
 }
 
-void Object::generateBoundingBox()
+void Object::GenerateBoundingBox()
 {
     _boundingBox.x = FLT_MAX, _boundingBox.y = FLT_MAX;
     float maxX{FLT_MIN}, maxY{FLT_MIN};
@@ -55,9 +47,8 @@ void Object::generateBoundingBox()
 }
 
 
-const Rectangle &Object::getAABB()
+const Rectangle &Object::GetAABB()
 {
-//    generateBoundingBox();
     _aabb = {_boundingBox};
     _aabb.x = _boundingBox.x + _position.x;
     _aabb.y = _boundingBox.y + _position.y;
@@ -65,76 +56,75 @@ const Rectangle &Object::getAABB()
     _aabb.height = _boundingBox.height;
     return _aabb;
 }
+
 void Object::Rotate(float rotations)
 {
     _rotation += rotations * DEG2RAD;
     _rotation = fmod(_rotation, PI * 2) - PI; //todo test this
-    generateBoundingBox(); // todo not gonna work, points arents really rotated so no new bounding box
+    GenerateBoundingBox();
 }
+
 void Object::Move(const Vector2 &move)
 {
-//    _dirtyPosAABB = true; //object was moved, need to recalculate AABB position
     _position = Vector2Add(_position, move);
 
     _aabb.x = _boundingBox.x + _position.x;
     _aabb.y = _boundingBox.y + _position.y;
 }
 
-//Object Object::GetTriangle(float base, float height)
-//{
-//    return Object(Vector2());
-//}
-//Object Object::GetRectangle(float width, float height)
-//{
-//    return Object(Vector2());
-//}
-//Object Object::GetSquare(float size)
-//{
-//    return Object(Vector2());
-//}
-//Object Object::GetSymetricPolygon(float radius, int sides)
-//{
-//    return Object(Vector2());
-//}
-Object Object::AddRandomPoly(const RandomPolyParams &params)
+Object Object::GetTriangle(float base, float height)
 {
     std::vector<Vector2> points{};
-    Vector2 pos
-            {
-                    .x=Utils::Random(params.minBounds.x, params.maxBounds.x),
-                    .y=Utils::Random(params.minBounds.y, params.maxBounds.y)
-            };
 
-    float rotation = Utils::Random(-180.0f, 180.0f);
+    Object obj{Vector2Zero(), 0.f};
 
-    int pointsCount = Utils::Random(params.minPoints, params.maxPoints);
-
-    Object obj{pos, rotation};
-
-    float radius = Utils::Random(params.minRadius, params.maxRadius);
-
-    float dAngle = 360.0f / (float) pointsCount;
-    for (int i = 0; i < pointsCount; ++i)
-    {
-        float angle = (float) i * dAngle + Utils::Random(-dAngle / 3.0f, dAngle / 3.0f);
-        float dist = radius;
-
-        points.emplace_back(Vector2Scale(Vector2{.x=cosf(DEG2RAD * angle), .y=sinf(DEG2RAD * angle)}, dist));
-    }
+    points.push_back({-base * 0.5f, height * 0.5f});
+    points.push_back({base * 0.5f, height * 0.5f});
+    points.push_back({0.0f, -height * 0.5f});
 
     obj.addPoints(std::move(points));
-
-//    obj.speed = Utils::Random(params.minSpeed, params.maxSpeed);
-
     return obj;
 }
+
+//Object Object::GetRandomPoly(const RandomPolyParams &params)
+//{
+//    std::vector<Vector2> points{};
+//    Vector2 pos
+//            {
+//                    .x=RandomUtils::RandomRange(params.minBounds.x, params.maxBounds.x),
+//                    .y=RandomUtils::RandomRange(params.minBounds.y, params.maxBounds.y)
+//            };
+//
+//    float rotation = RandomUtils::RandomRange(-180.0f, 180.0f);
+//
+//    int pointsCount = RandomUtils::RandomRange(params.minPoints, params.maxPoints);
+//
+//    Object obj{pos, rotation};
+//
+//    float radius = RandomUtils::RandomRange(params.minRadius, params.maxRadius);
+//
+//    float dAngle = 360.0f / (float) pointsCount;
+//    for (int i = 0; i < pointsCount; ++i)
+//    {
+//        float angle = (float) i * dAngle + RandomUtils::RandomRange(-dAngle / 3.0f, dAngle / 3.0f);
+//        float dist = radius;
+//
+//        points.emplace_back(Vector2Scale(Vector2{.x=cosf(DEG2RAD * angle), .y=sinf(DEG2RAD * angle)}, dist));
+//    }
+//
+//    obj.addPoints(std::move(points));
+//
+////    obj.speed = Utils::Random(params.minSpeed, params.maxSpeed);
+//
+//    return obj;
+//}
 void Object::addPoints(std::vector<Vector2> &&points)
 {
     _points = std::move(points);
     _transformedPoints.resize(_points.size(), _points[0]);
-    generateBoundingBox();
+    GenerateBoundingBox();
 }
-Vector2 &Object::GetFurthestPoint(Vector2 direction) //todo opti
+Vector2 &Object::GetFurthestPoint(Vector2 direction) //todo opti ?
 {
     float maxDistance = -FLT_MAX;
     Vector2 &bestPoint = _transformedPoints[0];
@@ -158,4 +148,42 @@ Vector2 Object::GetSupport(Object &o1, Object &o2, Vector2 direction)
 inline const Vector2 &Object::GetPosition() const
 {
     return _position;
+}
+void Object::SetPosition(const Vector2 &position)
+{
+    _position = position;
+}
+float Object::GetRotation() const
+{
+    return _rotation;
+}
+void Object::SetRotation(float rotation)
+{
+    _rotation = rotation;
+}
+Color Object::GetColor() const
+{
+    return _color;
+}
+void Object::SetColor(const Color &color)
+{
+    _color = color;
+}
+bool Object::isPointInside(const Vector2 &point) const
+{
+    float maxDist = -FLT_MAX;
+
+    for (int i = 0; i < _transformedPoints.size(); i++)
+    {
+        Vector2 a = _transformedPoints[i];
+        Vector2 b = _transformedPoints[(i + 1) % _transformedPoints.size()];
+        Vector2 nDir = Vector2Normalize(Vector2Subtract(b, a));
+
+        Vector2 temp = Vector2Subtract(point, a);
+        float dist = Vector2DotProduct(temp, nDir);
+
+        maxDist = dist > maxDist ? dist : maxDist;
+    }
+
+    return maxDist <= 0.f;
 }

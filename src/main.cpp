@@ -1,8 +1,9 @@
 #include "raylib.h"
 #include "Scene/SceneManager.hpp"
-#include "Scene/World.hpp"
+#include "World.hpp"
 #include "fmt/core.h"
 #include "Scene/SceneBouncingPoly.hpp"
+#include "Scene/SceneDebug.hpp"
 #include "Object/Object.hpp"
 
 #define RAYMATH_STATIC_INLINE
@@ -18,9 +19,9 @@ int main()
 
     SetTargetFPS(0);
 
-    World world{screenSize};
+    PhysicsEngine::World world{screenSize, debug};
 
-    RandomPolyParams params
+    PhysicsEngine::Shape::RandomPolyParams params
             {
                     .minPoints = 3,
                     .maxPoints = 7,
@@ -32,8 +33,9 @@ int main()
                     .maxSpeed = 3.0f
             };
 
-    SceneManager sceneManager{world};
-    sceneManager.AddScene<SceneBouncingPoly>(world, 200, params);
+    PhysicsEngine::SceneManager sceneManager{world};
+    sceneManager.AddScene<PhysicsEngine::SceneDebug>(world);
+    sceneManager.AddScene<PhysicsEngine::SceneBouncingPoly>(world, 200, params);
 
     sceneManager.LoadScene(0);
 
@@ -44,11 +46,10 @@ int main()
             sceneManager.Reload();
 
         if (IsKeyPressed(KEY_F2))
-            sceneManager.LoadScene(
-                    sceneManager.GetCurrentSceneIndex() > 0 ? sceneManager.GetCurrentSceneIndex() - 1 : 0);
+            sceneManager.LoadScene(sceneManager.GetSceneIndex() > 0 ? sceneManager.GetSceneIndex() - 1 : 0);
 
         if (IsKeyPressed(KEY_F3))
-            sceneManager.LoadScene(sceneManager.GetCurrentSceneIndex() + 1);
+            sceneManager.LoadScene(sceneManager.GetSceneIndex() + 1);
 
         if (IsKeyPressed(KEY_F4))         //Do debug stuff
             debug = !debug;
@@ -60,7 +61,7 @@ int main()
         }
 
         // Update
-        world.Update(GetFrameTime(), debug);
+//        world.Update(GetFrameTime(), debug);
 
 
         // Draw
@@ -69,10 +70,10 @@ int main()
 
         ClearBackground(RAYWHITE);
 
-        world.Draw(debug);
+        DrawText(fmt::format("F1: Reset scene, F2: Prev. scene, F3: Next scene,F4: Debug, F5: Lock FPS").c_str(), 5, 0,
+                 20, LIME);
+        DrawText(fmt::format("Current scene: {}", sceneManager.GetSceneIndex() + 1).c_str(), 5, 25, 20, LIME);
 
-        DrawText(fmt::format("F1: Reset scene, F2: prev scene, F3: next scene, cur scene: {}, F4: debug, F5: lock FPS",
-                             sceneManager.GetCurrentSceneIndex()).c_str(), 5, 0, 20, LIME);
         DrawFPS((int) screenSize.x - (int) (screenSize.x / 10), 0);
 
 

@@ -1,4 +1,5 @@
 add_subdirectory(Raylib)
-add_subdirectory(SquirrelNoise)
+#add_subdirectory(SquirrelNoise)
 add_subdirectory(fmt)
-add_subdirectory(thread-pool)
+#add_subdirectory(thread-pool)
+add_subdirectory(flecs)

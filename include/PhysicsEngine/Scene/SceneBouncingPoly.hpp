@@ -2,18 +2,21 @@
 #define PHYSICSENGINE_SCENEBOUNCINGPOLY_HPP
 
 
-#include "SceneBase.hpp"
+#include "Scene.hpp"
 #include "Object/Object.hpp"
+#include "Components/Shape.hpp"
 
-class SceneBouncingPoly : public SceneBase
+namespace PhysicsEngine
 {
-private:
-    unsigned int _polycount;
-    RandomPolyParams _polyParams;
-public:
-    explicit SceneBouncingPoly(World &world, int polycount,const RandomPolyParams& polyParams);
-    void Create() override;
-};
-
+    class SceneBouncingPoly : public Scene
+    {
+    private:
+        unsigned int _polycount;
+        Shape::RandomPolyParams _polyParams;
+    public:
+        explicit SceneBouncingPoly(World &world, int polycount, const Shape::RandomPolyParams &polyParams);
+        void Create() override;
+    };
+}
 
 #endif //PHYSICSENGINE_SCENEBOUNCINGPOLY_HPP

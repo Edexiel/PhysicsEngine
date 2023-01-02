@@ -2,17 +2,20 @@
 
 ## Description
 
-2D physics engine using Sweep and prune broadphase.
+2D physics engine using **Sweep and prune** for the _broad phase_ and **GJK** for the _narrow phase_.
 
 BroadPhase algorithm and AABB collision
 
-Polygons in purple are detected as potential collision
-Polygons in black not
-AABB in green means there is no collisions with another AABB
-AABB in red means there is a collision with another AABB
+AABB in **green** means there is no collisions with another AABB
 
+AABB in **yellow** means there is a collision with another AABB
+
+Polygons in **red** are detected as collision determined by GJK
+
+Polygons in **black** not
 
 Sweep and prune algorithm :
+
 ```cpp
 // /src/Scene/World.cpp
 // /include/PhysicsEngine/Scene/World.hpp
@@ -22,6 +25,7 @@ bool AABBCollide(const Rectangle& a, const Rectangle&b) const;
 ```
 
 GJK algorithm (does not works 😭)
+
 ```cpp
 // /src/Scene/World.cpp
 // /include/PhysicsEngine/Scene/World.hpp
@@ -29,10 +33,12 @@ GJK algorithm (does not works 😭)
 bool gjk(Object &a, Object &ObjectB);
 
 ```
-main program and scene config : 
+
+main program and scene config :
+
 ```cpp
 // src/main.cpp
-Vector2 screenSize{.x=1280, .y=720};
+Vector2 screenSize{ .x=1280, .y=720 };
 
 RandomPolyParams params
 {
@@ -40,16 +46,21 @@ RandomPolyParams params
 .maxPoints = 8,
 .minRadius = 10.0f,
 .maxRadius = 35.0f,
-.minBounds = Vector2{.x=50, .y= 50},
-.maxBounds = Vector2{.x=screenSize.x - 50, .y=screenSize.y - 50},
+.minBounds = Vector2{
+.x=50, .y= 50
+},
+.maxBounds = Vector2{
+.x=screenSize.x - 50, .y=screenSize.y - 50
+},
 .minSpeed = 1.0f,
 .maxSpeed = 3.0f
 };
 
 
-SceneManager sceneManager{world};
+SceneManager sceneManager{ world };
 sceneManager.AddScene<SceneBouncingPoly>(world, 50, params);
 ```
+
 ## Builds
 
 ### Linux
@@ -129,13 +140,17 @@ cmake --build cmake-build-release -j12
 [//]: # (## State)
 
 [//]: # ()
+
 [//]: # (### What works :)
 
 [//]: # ()
+
 [//]: # (- AABB)
 
 [//]: # ()
+
 [//]: # (### What doesn't)
 
 [//]: # ()
+
 [//]: # (- other stuff )
