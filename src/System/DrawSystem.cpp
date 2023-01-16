@@ -1,28 +1,43 @@
+#include <iostream>
 #include "System/DrawSystem.hpp"
 
 
 #include "Components/Shape.hpp"
 #include "Components/RigidBody.hpp"
 
-#include "World.hpp"
 #include "flecs.h"
 #include "raylib.h"
 
 
-void PhysicsEngine::DrawSystem::RegisterSystem(flecs::world &ecs)
+PhysicsEngine::DrawSystem::DrawSystem(flecs::world &ecs, bool &debug) : System(ecs), _debug(debug)
 {
-    ecs.system<Shape::TransformedPoints, const Shape::VertexColor, const RigidBody::AABB>("Draw")
-            .each([&debug = _debug](Shape::TransformedPoints &tp,
-                                    const Shape::VertexColor &vertexColor,
-                                    const RigidBody::AABB &AABB) {
-                std::vector<Vector2> &points = tp.points;
-                DrawLineStrip(points.data(), (int) points.size(), vertexColor.color);
-                DrawLineV(points[0], points[points.size() - 1], vertexColor.color);
+    TraceLog(LOG_INFO, "Registering draw system");
 
+    _system = ecs.system<Shape::TransformedPoints, const Shape::VertexColor, const RigidBody::AABB>("Draw")
+            .each([&debug = _debug](
+                    flecs::entity e,
+                    Shape::TransformedPoints &tp,
+                    const Shape::VertexColor &vertexColor,
+                    const RigidBody::AABB &AABB) {
+
+//                TraceLog(LOG_INFO, "Running draw system");
+
+                flecs::vector<Vector2> &points = tp.points;
+
+                DrawLineStrip(&points[0], (int) points.count(), vertexColor.color);
+                DrawLineV(points[0], points[points.count() - 1], vertexColor.color);
+
+                // If debug mode is on we draw the AABB
                 if (debug)
                 {
                     const Rectangle &temp = AABB.aabb;
                     const Color color = LIME;//object.collide ? ORANGE : LIME;
+
+//                    if (e.is_pair())
+//                    {
+//                        TraceLog(LOG_INFO, "POUET");
+//
+//                    }
 
                     DrawLine(temp.x, temp.y, temp.x + temp.width, temp.y, color); //top
                     DrawLine(temp.x, temp.y + temp.height, temp.x + temp.width, temp.y + temp.height, color); //top
@@ -33,5 +48,7 @@ void PhysicsEngine::DrawSystem::RegisterSystem(flecs::world &ecs)
 
             });
 }
-
-PhysicsEngine::DrawSystem::DrawSystem(PhysicsEngine::World &world) : System(world), _debug{world._debug} {}
+void PhysicsEngine::DrawSystem::Run()
+{
+    System::Run();
+}

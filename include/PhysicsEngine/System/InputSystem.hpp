@@ -2,21 +2,22 @@
 #define PHYSICSENGINE_INPUTSYSTEM_HPP
 
 
-#include "System.hpp"
+#include "System/System.hpp"
 
 namespace PhysicsEngine
 {
 
     class InputSystem : public System
     {
+        flecs::system _select;
+        flecs::system _unselect;
+        flecs::system _move;
+
     public:
-        explicit InputSystem(World &world) : System(world) {};
+        explicit InputSystem(flecs::world &ecs);
+        void Run() override;
 
-        void RegisterSystem(flecs::world &ecs) override;
 
-        struct Target
-        {
-        };
     };
 }
 

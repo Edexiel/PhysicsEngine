@@ -1,25 +1,38 @@
+#include <iostream>
 #include "System/TransformSystem.hpp"
 
 #include "Components/Shape.hpp"
 #include "Components/Transform.hpp"
+#include "raymath.h"
 
-#include "flecs.h"
 
-void PhysicsEngine::TransformSystem::RegisterSystem(flecs::world &ecs)
+PhysicsEngine::TransformSystem::TransformSystem(flecs::world &ecs) : System(ecs)
 {
 
-    ecs.system<Shape::TransformedPoints, const Shape::Points, const Transform::Position, const Transform::Rotation>(
-                    "Transform")
-            .each([](Shape::TransformedPoints &tp,
-                     const Shape::Points &p,
+    _system = ecs.system<Shape::Points, const Transform::Position, const Transform::Rotation>("Transform")
+            .each([](flecs::entity e,
+                     Shape::Points &p,
                      const Transform::Position &pos,
                      const Transform::Rotation &r) {
 
-                for (int i = 0; i < p.points.size(); ++i)
+//                TraceLog(LOG_INFO, "Running Transform system");
+
+                flecs::vector<Vector2> tp{};
+
+                for (auto point: p.points)
                 {
-                    tp.points[i] = Vector2Add(pos.position, Vector2Rotate(p.points[i], r.rotation));
+                    tp.add(Vector2Add(pos.position, Vector2Rotate(point, r.rotation)));
                 }
+
+
+                e.set<Shape::TransformedPoints>({tp});
+
+
             });
 
 
+}
+void PhysicsEngine::TransformSystem::Run()
+{
+    System::Run();
 }

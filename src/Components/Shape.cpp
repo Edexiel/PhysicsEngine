@@ -2,15 +2,20 @@
 #include "Components/Shape.hpp"
 #include "Tools/RandomUtils.hpp"
 
-void PhysicsEngine::Shape::GetTriangle(float base, float height, std::vector<Vector2> &points)
+flecs::vector<Vector2> PhysicsEngine::Shape::GetTriangle(float base, float height)
 {
-    points.push_back({-base * 0.5f, height * 0.5f});
-    points.push_back({base * 0.5f, height * 0.5f});
-    points.push_back({0.0f, -height * 0.5f});
+    flecs::vector<Vector2> points;
+    points.add({-base * 0.5f, height * 0.5f});
+    points.add({base * 0.5f, height * 0.5f});
+    points.add({0.0f, -height * 0.5f});
+    return points;
 }
-void PhysicsEngine::Shape::GetRandomPoly(const PhysicsEngine::Shape::RandomPolyParams &params, Vector2 &position,
-                                         Vector2 &velocity, float &rotation, std::vector<Vector2> &points)
+flecs::vector<Vector2>
+PhysicsEngine::Shape::GetRandomPoly(const PhysicsEngine::Shape::RandomPolyParams &params, Vector2 &position,
+                                    Vector2 &velocity, float &rotation)
 {
+    flecs::vector<Vector2> points;
+
     position =
             {
                     .x=RandomUtils::RandomRange(params.minBounds.x, params.maxBounds.x),
@@ -34,8 +39,9 @@ void PhysicsEngine::Shape::GetRandomPoly(const PhysicsEngine::Shape::RandomPolyP
         float angle = (float) i * dAngle + RandomUtils::RandomRange(-dAngle / 3.0f, dAngle / 3.0f);
         float dist = radius;
 
-        points.emplace_back(Vector2Scale(Vector2{.x=cosf(DEG2RAD * angle), .y=sinf(DEG2RAD * angle)}, dist));
+        points.add(Vector2Scale(Vector2{.x=cosf(DEG2RAD * angle), .y=sinf(DEG2RAD * angle)}, dist));
     }
+    return points;
 
 }
 bool PhysicsEngine::Shape::PointInsideShape(const std::vector<Vector2> &transformedPoints, Vector2 point)

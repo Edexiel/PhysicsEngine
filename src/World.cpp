@@ -1,4 +1,3 @@
-#include "World.hpp"
 #include "Object/Object.hpp"
 #include <algorithm>
 #include "raymath.h"
@@ -19,127 +18,68 @@ PhysicsEngine::World::World(Vector2 &screenSize, bool &debug) : screenSize(scree
     _ecs = new flecs::world;
 }
 
+void PhysicsEngine::World::Update(float deltaTime, bool debug)
+{
+}
 //Sweep and prune
-void PhysicsEngine::World::GetCollidingPairsToCheck(std::vector<CollisionPair> &pairsToCheck)
-{
-    pairsToCheck.clear();
-    std::sort(_objects.begin(), _objects.end(), AABBComp);
-
-    for (int i = 0; i < _objects.size(); ++i)
-    {
-        const Rectangle &rec = _objects[i].GetAABB();
-
-        for (int j = i + 1; j < _objects.size(); ++j)
-        {
-            const Rectangle &nextRec = _objects[j].GetAABB();
-
-            if (nextRec.x > (rec.x + rec.width))
-            {
-                _objects[i].collide = false;
-                _objects[j].collide = false;
-
-                break;
-            }
-            pairsToCheck.emplace_back(_objects[i], _objects[j]);
-        }
-    }
-}
-void PhysicsEngine::World::AABBCollisionCheck(std::vector<CollisionPair> &pairsToCheck)
-{
-    _collidingPairs.clear();
-
-    for (const CollisionPair &pair: _pairsToCheck)
-    {
-        if (Maths::AABBCollideY(pair.a.GetAABB(), pair.b.GetAABB()))
-        {
-            pair.a.collide = pair.b.collide = true;
-            _collidingPairs.emplace_back(pair);
-        }
-    }
-}
-
-
-void PhysicsEngine::World::BroadPhase()
-{
-    GetCollidingPairsToCheck(_pairsToCheck);
-    AABBCollisionCheck(_pairsToCheck);
-}
-
-//bool PhysicsEngine::World::gjk(Object &ObjectA, Object &ObjectB)
+//void PhysicsEngine::World::GetCollidingPairsToCheck(std::vector<CollisionPair> &pairsToCheck)
 //{
+//    pairsToCheck.clear();
+//    std::sort(_objects.begin(), _objects.end(), AABBComp);
 //
-//    int index = 0;
-//    Vector2 simplex[3]{};
-//    Vector2 direction, ab, ao, ac, acperp, abperp;
-//
-//    //First point simplex[0] ==> a
-//    simplex[0] = Object::GetSupport(ObjectA, ObjectB, {1.f, 0.f});
-//    //First direction
-//    direction = Vector2Scale(simplex[0], -1.f);
-//
-//    while (true)
+//    for (int i = 0; i < _objects.size(); ++i)
 //    {
-//        index++;
-//        //second point
-//        simplex[index] = Object::GetSupport(ObjectA, ObjectB, direction);
-//        //no collision
-//        if (Vector2DotProduct(simplex[index], direction) <= 0)
-//            return false;
+//        const Rectangle &rec = _objects[i].GetAABB();
 //
-//        if (index == 1) //Line
+//        for (int j = i + 1; j < _objects.size(); ++j)
 //        {
-//            //second direction
-//            ab = Vector2Subtract(simplex[1], simplex[0]);
-//            ao = Vector2Scale(simplex[0], -1.f);
+//            const Rectangle &nextRec = _objects[j].GetAABB();
 //
-//            if (Vector2DotProduct(direction, ao) > 0)
+//            if (nextRec.x > (rec.x + rec.width))
 //            {
-//                direction = Maths::TripleProduct(ab, ao, ab);
-//            } else
-//            {
-//                direction = ao;
-//                index--;
+//                _objects[i].collide = false;
+//                _objects[j].collide = false;
+//
+//                break;
 //            }
-//            continue;
+//            pairsToCheck.emplace_back(_objects[i], _objects[j]);
 //        }
-////        index == 2 //triangle
-//
-//        ab = Vector2Subtract(simplex[1], simplex[0]); //todo we already have it
-//        ac = Vector2Subtract(simplex[2], simplex[0]);
-//
-//        acperp = Maths::TripleProduct(ab, ac, ac);
-//
-//        if (Vector2DotProduct(direction, ao) >= 0)
-//        {
-//            direction = acperp;
-//        } else
-//        {
-//            abperp = Maths::TripleProduct(ac, ab, ab);
-//
-//            if (Vector2DotProduct(abperp, ao) < 0)
-//                return true; //collision
-//
-//            simplex[0] = simplex[1];
-//            direction = abperp;
-//        }
-//        simplex[1] = simplex[2];
-//        index--;
 //    }
+//}
+//void PhysicsEngine::World::AABBCollisionCheck(std::vector<CollisionPair> &pairsToCheck)
+//{
+//    _collidingPairs.clear();
 //
-//    return false;
+//    for (const CollisionPair &pair: _pairsToCheck)
+//    {
+//        if (Maths::AABBCollideY(pair.a.GetAABB(), pair.b.GetAABB()))
+//        {
+//            pair.a.collide = pair.b.collide = true;
+//            _collidingPairs.emplace_back(pair);
+//        }
+//    }
+//}
+//
+//
+//void PhysicsEngine::World::BroadPhase()
+//{
+//    GetCollidingPairsToCheck(_pairsToCheck);
+//    AABBCollisionCheck(_pairsToCheck);
 //}
 
-void PhysicsEngine::World::NarrowPhase()
-{
-    for (const auto &pair: _collidingPairs)
-    {
-        if (gjk(pair.a, pair.b))
-        {
-            pair.a.SetColor(RED);
-            pair.b.SetColor(RED);
-        }
-    }
-}
+
+
+//void PhysicsEngine::World::NarrowPhase()
+//{
+//    for (const auto &pair: _collidingPairs)
+//    {
+//        if (gjk(pair.a, pair.b))
+//        {
+//            pair.a.SetColor(RED);
+//            pair.b.SetColor(RED);
+//        }
+//    }
+//}
 
 //void PhysicsEngine::World::Update(float deltaTime, bool debug)
 //{
@@ -182,19 +122,15 @@ void PhysicsEngine::World::NarrowPhase()
 //{
 //    return _objects.emplace_back(object);
 //}
+//
+//void PhysicsEngine::World::Clear()
+//{
+//    for (System *s: _systems)
+//    {
+//        delete s;
+//    }
+//
+//    delete _ecs;
+//    _ecs = new flecs::world;
+//}
 
-void PhysicsEngine::World::Clear()
-{
-    for (System *s: _systems)
-    {
-        delete s;
-    }
-
-    delete _ecs;
-    _ecs = new flecs::world;
-}
-
-const std::vector<Object> &PhysicsEngine::World::GetObjects() const
-{
-    return _objects;
-}

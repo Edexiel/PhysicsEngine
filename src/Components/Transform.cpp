@@ -2,16 +2,15 @@
 #include "Components/Transform.hpp"
 #include "raymath.h"
 
-void PhysicsEngine::Transform::Rotation::Rotate(float amount)
+float PhysicsEngine::Transform::Rotate( float rotation,float amount)
 {
     rotation += amount * DEG2RAD;
     rotation = fmod(rotation, PI * 2) - PI;
+
+    return rotation;
 }
 
-void PhysicsEngine::Transform::Position::Move(const Vector2 &move)
+Vector2 PhysicsEngine::Transform::Move(const Vector2& position,const Vector2 &move)
 {
-    position = Vector2Add(position, move);
-//  todo
-//    _aabb.x = _boundingBox.x + _position.x;
-//    _aabb.y = _boundingBox.y + _position.y;
+    return Vector2Add(position, move);
 }

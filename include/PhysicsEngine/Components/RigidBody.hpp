@@ -3,14 +3,26 @@
 
 #include <vector>
 #include "raylib.h"
-
+#include "flecs.h"
 
 namespace PhysicsEngine
 {
     class RigidBody
     {
-
     public:
+        struct BroadTag
+        {
+            flecs::entity second;
+        };
+
+        struct NarrowTag
+        {
+        };
+        struct Collide
+        {
+
+        };
+
         struct Velocity
         {
             Vector2 velocity;
@@ -19,11 +31,17 @@ namespace PhysicsEngine
         struct AABB
         {
             Rectangle aabb;
-            bool PointInsideAABB(Vector2 point) const;
-
-            bool operator()(Rectangle &a, Rectangle &b) const;
 
         };
+
+//        struct AABBColor
+//        {
+//            Color color;
+//        };
+
+        static bool compare(const Rectangle &a, const Rectangle &b);
+        static bool PointInsideAABB(const Rectangle &aabb, const Vector2 &point);
+
 
     };
 }

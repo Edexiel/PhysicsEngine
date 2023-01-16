@@ -1,18 +1,11 @@
-#include "raylib.h"
-
 #include "Scene/SceneManager.hpp"
 #include "Scene/Scene.hpp"
-#include "World.hpp"
-#include "Scene/SceneBouncingPoly.hpp"
 
-
-PhysicsEngine::SceneManager::SceneManager(World &world) : _world(world) {}
 PhysicsEngine::SceneManager::~SceneManager()
 {
     for (Scene *scene: _scenes)
-    {
         delete scene;
-    }
+
     _scenes.clear();
 }
 
@@ -24,13 +17,17 @@ void PhysicsEngine::SceneManager::LoadScene(uint32_t index)
         TraceLog(LOG_ERROR, "Requested scene number is greater than total scenes");
         return;
     }
-    TraceLog(LOG_ALL, "TEST");
-    _world.Clear();
 
-    _scenes[index]->Create();
+    delete _ecs;
+    _ecs = new flecs::world;
+
+    _scenes[index]->Create(*_ecs,_world);
     _index = index;
 
 }
-
+void PhysicsEngine::SceneManager::Update()
+{
+    _scenes[_index]->Update(_world);
+}
 
 

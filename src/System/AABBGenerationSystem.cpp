@@ -1,23 +1,26 @@
+#include "System/AABBGenerationSystem.hpp"
 #include <cfloat>
-#include "System/PhysicsSystem.hpp"
-
+#include <iostream>
 
 #include "Components/RigidBody.hpp"
 #include "Components/Transform.hpp"
 #include "Components/Shape.hpp"
 
-#include "flecs.h"
 #include "raymath.h"
 
-void PhysicsEngine::PhysicsSystem::RegisterSystem(flecs::world &ecs)
+PhysicsEngine::AABBGenerationSystem::AABBGenerationSystem(flecs::world &ecs) : System(ecs)
 {
-    ecs.system<RigidBody::AABB, const Transform::Rotation, const Shape::TransformedPoints>("GenerateAABB")
-            .each([](RigidBody::AABB &b, const Transform::Rotation &r, const Shape::TransformedPoints &p) {
+    // Generate AABB
+    _system = ecs.system<const Transform::Rotation, Shape::TransformedPoints>("GenerateAABB")
+            .each([](flecs::entity e, const Transform::Rotation &r, Shape::TransformedPoints &p) {
 
-                Rectangle &boundingBox = b.aabb;
+//                TraceLog(LOG_INFO, "Running AABB system");
+//                std::cout<<e.name()<<std::endl;
+                Rectangle boundingBox;
 
                 boundingBox.x = FLT_MAX, boundingBox.y = FLT_MAX;
                 float maxX{FLT_MIN}, maxY{FLT_MIN};
+
 
                 for (const auto &point: p.points)
                 {
@@ -37,5 +40,12 @@ void PhysicsEngine::PhysicsSystem::RegisterSystem(flecs::world &ecs)
                 boundingBox.width = maxX - boundingBox.x;
                 boundingBox.height = maxY - boundingBox.y;
 
+                e.set<RigidBody::AABB>({boundingBox});
+
             });
+}
+void PhysicsEngine::AABBGenerationSystem::Run()
+{
+//    System::Run();
+    _system.run();
 }

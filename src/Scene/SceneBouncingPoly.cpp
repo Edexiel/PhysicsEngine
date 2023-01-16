@@ -1,8 +1,6 @@
 #include "Scene/SceneBouncingPoly.hpp"
 
 #include "raylib.h"
-#include "World.hpp"
-#include "System/InputSystem.hpp"
 #include "flecs.h"
 
 #include "Components/Shape.hpp"
@@ -11,28 +9,29 @@
 
 PhysicsEngine::SceneBouncingPoly::SceneBouncingPoly(World &world, int polycount,
                                                     const Shape::RandomPolyParams &polyParams) :
-        Scene(world), _polycount(polycount), _polyParams(polyParams) {}
+        Scene(),
+        _polycount(polycount),
+        _polyParams(polyParams) {}
 
 
-void PhysicsEngine::SceneBouncingPoly::Create()
+void PhysicsEngine::SceneBouncingPoly::Create(flecs::world &ecs, const World& world)
 {
-    Scene::Create();
+    Scene::Create(ecs, world);
+
 
     TraceLog(LOG_INFO, "Creating scene bouncingPoly");
-
-    flecs::world * w = _world._ecs;
 
     for (int i = 0; i < _polycount; ++i)
     {
         Vector2 position;
         Vector2 velocity;
         float rotation;
-        std::vector<Vector2> shape;
+
         Rectangle boundingBox;
 
-        PhysicsEngine::Shape::GetRandomPoly(_polyParams, position, velocity, rotation, shape);
+        flecs::vector<Vector2> shape = PhysicsEngine::Shape::GetRandomPoly(_polyParams, position, velocity, rotation);
 
-        w->entity()
+        ecs.entity()
                 .set<Transform::Position>({position})
                 .set<Transform::Rotation>({rotation})
                 .set<Shape::Points>({shape})
@@ -41,7 +40,9 @@ void PhysicsEngine::SceneBouncingPoly::Create()
                 .set<RigidBody::AABB>({});
     }
 
-//    w.system<>.kind(flecs::PreUpdate).each();
-    _world.AddSystem<InputSystem>();
-
 }
+void PhysicsEngine::SceneBouncingPoly::Update(const World& world)
+{
+    Scene::Update(world);
+}
+PhysicsEngine::SceneBouncingPoly::~SceneBouncingPoly() = default;

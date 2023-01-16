@@ -1,7 +1,7 @@
-#include "System.hpp"
-
 #ifndef PHYSICSENGINE_TRANSFORM_SYSTEM_HPP
 #define PHYSICSENGINE_TRANSFORM_SYSTEM_HPP
+
+#include "System.hpp"
 
 namespace PhysicsEngine
 {
@@ -9,9 +9,9 @@ namespace PhysicsEngine
     {
     public:
 
-        explicit TransformSystem(World &world) : System(world) {}
+        explicit TransformSystem(flecs::world &world);
 
-        void RegisterSystem(flecs::world &ecs) override;
+        void Run() override;
 
     };
 }

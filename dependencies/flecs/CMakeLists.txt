@@ -6,3 +6,8 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(flecs)
 
+set_property(TARGET flecs PROPERTY C_STANDARD 99)
+set_property(TARGET flecs_static PROPERTY C_STANDARD 99)
+
+target_compile_features(flecs PUBLIC c_std_99)
+target_compile_features(flecs_static PUBLIC c_std_99)

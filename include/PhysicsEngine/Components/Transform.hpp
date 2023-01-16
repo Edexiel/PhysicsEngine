@@ -6,20 +6,25 @@
 
 namespace PhysicsEngine
 {
+    struct Target
+    {
+
+    };
     class Transform
     {
     public:
         struct Position
         {
             Vector2 position;
-            void Move(const Vector2 &move);
         };
 
         struct Rotation
         {
             float rotation;
-            void Rotate(float amount);
         };
+
+        static float Rotate( float rotation,float amount);
+        static Vector2 Move(const Vector2& position,const Vector2 &move);
 
     };
 }

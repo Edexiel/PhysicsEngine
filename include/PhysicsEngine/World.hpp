@@ -35,7 +35,7 @@ namespace PhysicsEngine
 //        std::vector<Object> _objects;
 
 
-        void GetCollidingPairsToCheck(std::vector<CollisionPair> &pairsToCheck);
+//        void GetCollidingPairsToCheck(std::vector<CollisionPair> &pairsToCheck);
         void AABBCollisionCheck(std::vector<CollisionPair> &pairsToCheck);
 
         void BroadPhase();
@@ -55,8 +55,6 @@ namespace PhysicsEngine
         void Clear();
 
 
-        Object &AddObject(Object &&);
-
         template<class T, typename ... Types>
         void AddSystem(Types... t);
 
@@ -64,8 +62,6 @@ namespace PhysicsEngine
         const Vector2 &screenSize;
         const bool &_debug;
         flecs::world *_ecs;
-
-        const std::vector<Object> &GetObjects() const;
 
 
     };

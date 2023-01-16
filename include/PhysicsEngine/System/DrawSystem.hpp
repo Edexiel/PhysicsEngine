@@ -11,9 +11,9 @@ namespace PhysicsEngine
     private:
         const bool &_debug;
     public:
-        explicit DrawSystem(World &world);
+        explicit DrawSystem(flecs::world &ecs,bool& debug);
+        void Run() override;
 
-        void RegisterSystem(flecs::world &ecs) override;
     };
 }
 

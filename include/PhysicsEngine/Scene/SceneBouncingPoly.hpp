@@ -3,7 +3,6 @@
 
 
 #include "Scene.hpp"
-#include "Object/Object.hpp"
 #include "Components/Shape.hpp"
 
 namespace PhysicsEngine
@@ -11,11 +10,16 @@ namespace PhysicsEngine
     class SceneBouncingPoly : public Scene
     {
     private:
+
         unsigned int _polycount;
         Shape::RandomPolyParams _polyParams;
     public:
-        explicit SceneBouncingPoly(World &world, int polycount, const Shape::RandomPolyParams &polyParams);
-        void Create() override;
+        explicit SceneBouncingPoly(World& world,int polycount, const Shape::RandomPolyParams &polyParams);
+        virtual ~SceneBouncingPoly();
+
+
+        void Create(flecs::world& ecs,const World& world) override;
+        void Update(const World& world) override;
     };
 }
 

@@ -3,41 +3,43 @@
 
 #include <stdint.h>
 #include <vector>
+#include "flecs.h"
+#include "raylib.h"
+
+#include "Scene.hpp"
 
 namespace PhysicsEngine
 {
     class Scene;
-
-    class World;
 
     class SceneManager
     {
     private:
         uint32_t _index = 0;
         std::vector<Scene *> _scenes;
+        flecs::world *_ecs = nullptr;
         World &_world;
 
     public:
-        SceneManager() = delete;
+        explicit SceneManager(World &world) : _world(world) {};
         ~SceneManager();
-        explicit SceneManager(World &world);
-
 
         void LoadScene(uint32_t index);
         inline void Reload() { LoadScene(_index); }
+        void Update();
         inline uint32_t GetSceneIndex() const { return _index; }
 
         template<class SceneType, typename ... Types>
-        void AddScene(World &world, Types... t);
+        void AddScene(Types... t);
     };
 
     template<class SceneType, typename ... Types>
-    void SceneManager::AddScene(World &world, Types... t)
+    void SceneManager::AddScene(Types... t)
     {
         TraceLog(LOG_INFO, "Adding new scene");
 
-        _scenes.push_back(new SceneType{world, t...});
+        _scenes.push_back(new SceneType{t...});
 
     }
 }
-#endif //PHYSICSENGINE_SCENEMANAGER_HS
+#endif //PHYSICSENGINE_SCENEMANAGER_H

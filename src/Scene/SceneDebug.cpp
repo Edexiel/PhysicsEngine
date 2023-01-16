@@ -1,50 +1,49 @@
 #include "Scene/SceneDebug.hpp"
-
-#include "raymath.h"
-
-#include "World.hpp"
-
 #include "Components/Shape.hpp"
-#include "Components/RigidBody.hpp"
 #include "Components/Transform.hpp"
 
 #include "flecs.h"
 
 
-PhysicsEngine::SceneDebug::SceneDebug(World &world) : Scene(world) {}
+PhysicsEngine::SceneDebug::SceneDebug(World &world) : Scene() {}
 
-void PhysicsEngine::SceneDebug::Create()
+void PhysicsEngine::SceneDebug::Create(flecs::world &ecs, const World& world)
 {
-    Scene::Create();
+    Scene::Create(ecs, world);
 
-    TraceLog(LOG_INFO, "Creating scene bouncingPoly");
+    TraceLog(LOG_INFO, "Creating scene debug");
 
-    const Vector2 &screen = _world.screenSize;
 
-    flecs::world * w = _world._ecs;
+//    float rotation=0;
 
-    float rotation;
-    std::vector<Vector2> points;
+    flecs::vector<Vector2> shape1 = PhysicsEngine::Shape::GetTriangle(300.0f, 200.0f);
 
-    PhysicsEngine::Shape::GetTriangle(300.0f, 200.0f, points);
-
-    w->entity()
-            .set<Transform::Position>({screen.x * 0.33f, screen.y / 2})
-            .set<Transform::Rotation>({rotation})
-            .set<Shape::Points>({points})
-            .set<Shape::TransformedPoints>({})
-            .set<RigidBody::Velocity>({Vector2Zero()})
-            .set<RigidBody::AABB>({});
-
-    PhysicsEngine::Shape::GetTriangle(250.0f, 200.0f, points);
-
-    w->entity()
-            .set<Transform::Position>({screen.x * 0.66f, screen.y / 2})
+    ecs.entity("Shape1")
+            .set<Transform::Position>({world.screen.x * 0.33f, world.screen.y / 2})
             .set<Transform::Rotation>({0})
-            .set<Shape::Points>({points})
-            .set<Shape::TransformedPoints>({})
-            .set<RigidBody::Velocity>({Vector2Zero()})
-            .set<RigidBody::AABB>({});
+            .set<Shape::Points>({shape1})
+            .set<Shape::VertexColor>({BLACK});
+
+    flecs::vector<Vector2> shape2 = PhysicsEngine::Shape::GetTriangle(250.0f, 200.0f);
+
+    ecs.entity("Shape2")
+            .set<Transform::Position>({world.screen.x * 0.66f, world.screen.y / 2})
+            .set<Transform::Rotation>({0})
+            .set<Shape::Points>({shape2})
+            .set<Shape::VertexColor>({BLACK});
+
+//    flecs::vector<Vector2> shape3 = PhysicsEngine::Shape::GetTriangle(100.0f, 100.0f);
+//
+//    ecs.entity("Shape3")
+//            .set<Transform::Position>({world.screen.x * 0.88f, world.screen.y / 2})
+//            .set<Transform::Rotation>({0})
+//            .set<Shape::Points>({shape3})
+//            .set<Shape::VertexColor>({BLACK});
 
 
 }
+void PhysicsEngine::SceneDebug::Update(const World& world)
+{
+    Scene::Update(world);
+}
+

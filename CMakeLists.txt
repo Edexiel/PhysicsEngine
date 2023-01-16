@@ -10,7 +10,7 @@ add_executable(${PROJECT_NAME}
         src/main.cpp
 
         #Core
-        src/World.cpp include/PhysicsEngine/World.hpp
+#        src/World.cpp include/PhysicsEngine/World.hpp
         src/Object/Object.cpp include/PhysicsEngine/Object/Object.hpp
 
         # Scenes
@@ -31,24 +31,24 @@ add_executable(${PROJECT_NAME}
         src/Components/Shape.cpp include/PhysicsEngine/Components/Shape.hpp
 
         #Systems
-        include/PhysicsEngine/System/System.hpp
+        src/System/System.cpp include/PhysicsEngine/System/System.hpp
         src/System/InputSystem.cpp include/PhysicsEngine/System/InputSystem.hpp
         src/System/DrawSystem.cpp include/PhysicsEngine/System/DrawSystem.hpp
-        src/System/PhysicsSystem.cpp include/PhysicsEngine/System/PhysicsSystem.hpp
+        src/System/AABBGenerationSystem.cpp include/PhysicsEngine/System/AABBGenerationSystem.hpp
         src/System/TransformSystem.cpp include/PhysicsEngine/System/TransformSystem.hpp
-        src/System/SweepAndPruneSystem.cpp include/PhysicsEngine/System/SweepAndPruneSystem.hpp)
+        src/System/BroadPhaseSystem.cpp include/PhysicsEngine/System/BroadPhaseSystem.hpp include/PhysicsEngine/System/NarrowPhaseSystem.hpp src/System/NarrowPhaseSystem.cpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE include/PhysicsEngine)
 target_link_libraries(${PROJECT_NAME} raylib fmt flecs)
 
 
 # Optimizations
-include(CheckIPOSupported)
-check_ipo_supported(RESULT supported OUTPUT error)
-
-if (supported)
-    message(STATUS "IPO / LTO enabled")
-    set_property(TARGET PhysicsEngine PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-else ()
-    message(STATUS "IPO / LTO not supported: <${error}>")
-endif ()
+#include(CheckIPOSupported)
+#check_ipo_supported(RESULT supported OUTPUT error)
+#
+#if (supported)
+#    message(STATUS "IPO / LTO enabled")
+#    set_property(TARGET PhysicsEngine PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+#else ()
+#    message(STATUS "IPO / LTO not supported: <${error}>")
+#endif ()

@@ -1,12 +1,12 @@
 #include "raylib.h"
 #include "Scene/SceneManager.hpp"
-#include "World.hpp"
+
 #include "fmt/core.h"
 #include "Scene/SceneBouncingPoly.hpp"
 #include "Scene/SceneDebug.hpp"
-#include "Object/Object.hpp"
 
 #define RAYMATH_STATIC_INLINE
+
 
 int main()
 {
@@ -19,7 +19,7 @@ int main()
 
     SetTargetFPS(0);
 
-    PhysicsEngine::World world{screenSize, debug};
+    World w{debug,screenSize};
 
     PhysicsEngine::Shape::RandomPolyParams params
             {
@@ -33,9 +33,9 @@ int main()
                     .maxSpeed = 3.0f
             };
 
-    PhysicsEngine::SceneManager sceneManager{world};
-    sceneManager.AddScene<PhysicsEngine::SceneDebug>(world);
-    sceneManager.AddScene<PhysicsEngine::SceneBouncingPoly>(world, 200, params);
+    PhysicsEngine::SceneManager sceneManager{w};
+    sceneManager.AddScene<PhysicsEngine::SceneDebug>(w);
+    sceneManager.AddScene<PhysicsEngine::SceneBouncingPoly>(w, 200, params);
 
     sceneManager.LoadScene(0);
 
@@ -60,6 +60,7 @@ int main()
             SetTargetFPS(fpsLock ? 60 : 0);
         }
 
+        sceneManager.Update();
         // Update
 //        world.Update(GetFrameTime(), debug);
 

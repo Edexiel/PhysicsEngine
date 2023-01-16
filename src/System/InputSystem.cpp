@@ -6,20 +6,19 @@
 
 #include "flecs.h"
 
-void PhysicsEngine::InputSystem::RegisterSystem(flecs::world &ecs)
+PhysicsEngine::InputSystem::InputSystem(flecs::world &ecs) : System(ecs)
 {
-    ecs.system<const RigidBody::AABB>("MousePick")
+    _select = ecs.system<const RigidBody::AABB>("Select")
             .each([](flecs::entity e, const RigidBody::AABB &aabb) {
 
-                if (aabb.PointInsideAABB(GetMousePosition()))
+                if (RigidBody::PointInsideAABB(aabb.aabb, GetMousePosition()))
                 {
-                    TraceLog(LOG_INFO, "NEW TARGET");
-
+//                    TraceLog(LOG_INFO, "NEW TARGET");
                     e.add<Target>();
                 }
             });
 
-    ecs.system<const RigidBody::AABB>("MouseUnpick")
+    _unselect = ecs.system<const RigidBody::AABB>("Unselect")
             .each([](flecs::entity e, const RigidBody::AABB &aabb) {
                 if (e.has<Target>())
                 {
@@ -27,10 +26,27 @@ void PhysicsEngine::InputSystem::RegisterSystem(flecs::world &ecs)
                 }
             });
 
-    ecs.system<const Target, Transform::Position>("MouseMove")
+    _move = ecs.system<const Target, Transform::Position>("Move")
             .each([](const Target &t, Transform::Position &p) {
-                p.Move(GetMouseDelta());
+                p.position = Transform::Move(p.position, GetMouseDelta());
             });
 
 
+}
+void PhysicsEngine::InputSystem::Run()
+{
+
+    if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+    {
+        _select.run();
+    }
+    if (IsMouseButtonReleased(MouseButton::MOUSE_BUTTON_LEFT))
+    {
+        _unselect.run();
+    }
+
+    if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_LEFT))
+    {
+        _move.run();
+    }
 }

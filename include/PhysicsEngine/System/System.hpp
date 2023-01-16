@@ -2,31 +2,23 @@
 #define PHYSICSENGINE_SYSTEM_HPP
 
 #include <vector>
-
-namespace flecs
-{
-    struct world;
-}
-
+#include "flecs.h"
 
 namespace PhysicsEngine
 {
-    class Object;
-
-    class World;
 
     class System
     {
     protected:
-        World &_world;
+        flecs::world &_ecs;
+        flecs::system _system;
 
-        explicit System(World &world) : _world(world) {};
+        explicit System(flecs::world &ecs);
 
     public:
         System() = delete;
-        virtual ~System() = default;
 
-        virtual void RegisterSystem(flecs::world &ecs) = 0;
+        virtual void Run();
 
     };
 }
