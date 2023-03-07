@@ -11,12 +11,12 @@ namespace PhysicsEngine
     class SceneDebug : public Scene
     {
     public:
-        explicit SceneDebug(World& world);
+        explicit SceneDebug(World &world);
         virtual ~SceneDebug() = default;
 
 
-        void Create(flecs::world &ecs,const World& world) override;
-        void Update(const World& world) override;
+        void Create(flecs::world &ecs, const World &world) override;
+        void Update(flecs::world &ecs, const World &world) override;
     };
 }
 

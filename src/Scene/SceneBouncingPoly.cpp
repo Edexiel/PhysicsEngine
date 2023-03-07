@@ -41,8 +41,8 @@ void PhysicsEngine::SceneBouncingPoly::Create(flecs::world &ecs, const World& wo
     }
 
 }
-void PhysicsEngine::SceneBouncingPoly::Update(const World& world)
+void PhysicsEngine::SceneBouncingPoly::Update(flecs::world&ecs,const World& world)
 {
-    Scene::Update(world);
+    Scene::Update(ecs,world);
 }
 PhysicsEngine::SceneBouncingPoly::~SceneBouncingPoly() = default;

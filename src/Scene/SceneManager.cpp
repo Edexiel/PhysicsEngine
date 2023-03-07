@@ -27,7 +27,7 @@ void PhysicsEngine::SceneManager::LoadScene(uint32_t index)
 }
 void PhysicsEngine::SceneManager::Update()
 {
-    _scenes[_index]->Update(_world);
+    _scenes[_index]->Update(*_ecs,_world);
 }
 
 

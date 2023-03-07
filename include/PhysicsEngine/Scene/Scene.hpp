@@ -41,7 +41,7 @@ namespace PhysicsEngine
     public:
         ~Scene();
         virtual void Create(flecs::world &ecs, const World &world);
-        virtual void Update(const World &world);
+        virtual void Update(flecs::world &ecs, const World &world);
     };
 }
 #endif //PHYSICSENGINE_SCENE_HPP

@@ -12,7 +12,6 @@ namespace PhysicsEngine
     public:
         struct BroadTag
         {
-            flecs::entity second;
         };
 
         struct NarrowTag
@@ -31,7 +30,6 @@ namespace PhysicsEngine
         struct AABB
         {
             Rectangle aabb;
-
         };
 
 //        struct AABBColor

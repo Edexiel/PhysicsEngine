@@ -7,12 +7,11 @@
 
 PhysicsEngine::SceneDebug::SceneDebug(World &world) : Scene() {}
 
-void PhysicsEngine::SceneDebug::Create(flecs::world &ecs, const World& world)
+void PhysicsEngine::SceneDebug::Create(flecs::world &ecs, const World &world)
 {
     Scene::Create(ecs, world);
 
     TraceLog(LOG_INFO, "Creating scene debug");
-
 
 //    float rotation=0;
 
@@ -42,8 +41,8 @@ void PhysicsEngine::SceneDebug::Create(flecs::world &ecs, const World& world)
 
 
 }
-void PhysicsEngine::SceneDebug::Update(const World& world)
+void PhysicsEngine::SceneDebug::Update(flecs::world&ecs,const World &world)
 {
-    Scene::Update(world);
+    Scene::Update(ecs,world);
 }
 

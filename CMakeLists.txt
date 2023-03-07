@@ -39,7 +39,7 @@ add_executable(${PROJECT_NAME}
         src/System/BroadPhaseSystem.cpp include/PhysicsEngine/System/BroadPhaseSystem.hpp include/PhysicsEngine/System/NarrowPhaseSystem.hpp src/System/NarrowPhaseSystem.cpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE include/PhysicsEngine)
-target_link_libraries(${PROJECT_NAME} raylib fmt flecs)
+target_link_libraries(${PROJECT_NAME} raylib fmt EnTT::EnTT)
 
 
 # Optimizations

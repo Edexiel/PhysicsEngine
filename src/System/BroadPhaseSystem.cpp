@@ -1,3 +1,4 @@
+#include <iostream>
 #include "System/BroadPhaseSystem.hpp"
 
 
@@ -17,11 +18,13 @@ PhysicsEngine::BroadPhaseSystem::BroadPhaseSystem(flecs::world &ecs) : System(ec
                     })
             .iter([](flecs::iter &it, const RigidBody::AABB *aabbs) {
 
-//                TraceLog(LOG_INFO, "Running AABB system");
+                TraceLog(LOG_INFO, "Running AABB system");
 
 
                 for (int i = 0; i < it.count(); ++i)
                 {
+                    std::cout << it.entity(i).name() << std::endl;
+
                     const Rectangle &rec = aabbs[i].aabb;
 
                     for (int j = i + 1; j < it.count(); ++j)
@@ -36,6 +39,8 @@ PhysicsEngine::BroadPhaseSystem::BroadPhaseSystem(flecs::world &ecs) : System(ec
                         if (Maths::AABBCollideY(rec, nextRec))
                         {
                             TraceLog(LOG_INFO, "Collision!!!!!");
+                            it.entity(i).add<RigidBody::BroadTag>(it.entity(j));
+                            it.entity(j).add<RigidBody::BroadTag>(it.entity(i));
                         }
                     }
                 }

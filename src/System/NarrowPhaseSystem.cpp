@@ -1,5 +1,5 @@
+#include <iostream>
 #include "System/NarrowPhaseSystem.hpp"
-
 
 #include "Components/RigidBody.hpp"
 #include "flecs.h"
@@ -9,6 +9,12 @@
 
 PhysicsEngine::NarrowPhaseSystem::NarrowPhaseSystem(flecs::world &ecs) : System(ecs)
 {
+
+    _system = ecs.system<RigidBody::BroadTag>("NarrowPhaseSystem")
+            .each([](flecs::entity e, RigidBody::BroadTag) {
+
+                std::cout << e.name() << std::endl;
+            });
 
 //    bool PhysicsEngine::World::gjk(Object &ObjectA, Object &ObjectB)
 //    {
@@ -77,4 +83,6 @@ PhysicsEngine::NarrowPhaseSystem::NarrowPhaseSystem(flecs::world &ecs) : System(
 void PhysicsEngine::NarrowPhaseSystem::Run()
 {
     System::Run();
+
+
 }

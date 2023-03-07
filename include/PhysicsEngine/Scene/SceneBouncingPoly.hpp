@@ -19,7 +19,7 @@ namespace PhysicsEngine
 
 
         void Create(flecs::world& ecs,const World& world) override;
-        void Update(const World& world) override;
+        void Update(flecs::world& ecs,const World& world) override;
     };
 }
 

@@ -5,6 +5,10 @@
 #include "System/AABBGenerationSystem.hpp"
 #include "System/InputSystem.hpp"
 #include "System/BroadPhaseSystem.hpp"
+#include "System/NarrowPhaseSystem.hpp"
+
+#include "Components/RigidBody.hpp"
+#include "Components/Transform.hpp"
 
 #include "raylib.h"
 #include "flecs.h"
@@ -18,12 +22,13 @@ void PhysicsEngine::Scene::Create(flecs::world &ecs, const World &world)
     _transformSystem = new TransformSystem(ecs);
     _aabbSystem = new AABBGenerationSystem(ecs);
     _broadPhaseSystem = new BroadPhaseSystem(ecs);
-//    _narrowPhaseSystem = new NarrowPhaseSystem(ecs);
+    _narrowPhaseSystem = new NarrowPhaseSystem(ecs);
 
     _drawsystem = new DrawSystem(ecs, world.debug);
 
+
 }
-void PhysicsEngine::Scene::Update(const World &world)
+void PhysicsEngine::Scene::Update(flecs::world &ecs, const World &world)
 {
 
     _inputSystem->Run();
@@ -38,17 +43,18 @@ void PhysicsEngine::Scene::Update(const World &world)
     if (world.debug)
     {
         std::basic_string<char> message = _timer.GetStringDuration("Broad phase :");
-        DrawText(message.c_str(), 5, (int) world.screen.y - 40, 20, LIME);
+        DrawText(message.c_str(), 5, (int) world.screen.y - 60, 20, LIME);
     }
 
-//    _timer.Start();
-//    _narrowPhaseSystem->Run();
-//    _timer.Stop();
-//    if (world.debug)
-//    {
-//        std::basic_string<char> message = _timer.GetStringDuration("Systems :");
-//        DrawText(message.c_str(), 5, (int) screenSize.y - 60, 20, LIME);
-//    }
+    _timer.Start();
+    _narrowPhaseSystem->Run();
+    _timer.Stop();
+
+    if (world.debug)
+    {
+        std::basic_string<char> message = _timer.GetStringDuration("NarrowPhase :");
+        DrawText(message.c_str(), 5, (int) world.screen.y - 40, 20, LIME);
+    }
 
     _drawsystem->Run();
 
